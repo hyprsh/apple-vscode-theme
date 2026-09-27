@@ -99,19 +99,24 @@ VS Code `settings.json` (the integrated terminal inherits the editor font):
 ```jsonc
 "editor.fontFamily": "'SF Mono Terminal', ui-monospace, Menlo, monospace",
 "editor.fontSize": 16,
-"editor.lineHeight": 1.2,
-"terminal.integrated.fontSize": 16
+"editor.lineHeight": 29,
+"terminal.integrated.fontSize": 16,
+"terminal.integrated.lineHeight": 1.5
 ```
-
-`editor.lineHeight` matches Ghostty's tighter line spacing; VS Code defaults to
-1.5.
 
 Ghostty config:
 
 ```
 font-family = SF Mono Terminal
 font-size = 16
+adjust-cell-height = 50%
 ```
+
+This gives the editor and both terminals the same roomier line spacing. The
+editor's `lineHeight` is in pixels because it multiplies the font size, while
+the terminals multiply the font's taller natural line height. For the tighter
+spacing Terminal.app uses, drop `adjust-cell-height` and the terminal
+`lineHeight`, and set `editor.lineHeight` to 1.2.
 
 Quit and reopen VS Code afterwards; a window reload doesn't pick up new fonts.
 The installed copies don't update with macOS, so repeat the install after a
