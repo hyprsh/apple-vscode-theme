@@ -99,9 +99,12 @@ VS Code `settings.json` (the integrated terminal inherits the editor font):
 ```jsonc
 "editor.fontFamily": "'SF Mono Terminal', ui-monospace, Menlo, monospace",
 "editor.fontSize": 16,
-"editor.fontWeight": "500",
+"editor.lineHeight": 1.2,
 "terminal.integrated.fontSize": 16
 ```
+
+`editor.lineHeight` matches Ghostty's tighter line spacing; VS Code defaults to
+1.5.
 
 Ghostty config:
 
