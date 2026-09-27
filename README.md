@@ -1,8 +1,12 @@
 # Apple System Colors for VS Code
 
-Light and dark VS Code themes built from the same palettes as Ghostty's
-`Apple System Colors` and `Apple System Colors Light` themes, so the editor and
-the integrated terminal match Ghostty exactly.
+Light and dark VS Code themes built from Apple terminal palettes, so the editor
+and the integrated terminal match your terminal exactly:
+
+- **Apple System Colors** / **Apple System Colors Light**: Ghostty's bundled
+  themes of the same name.
+- **Clear Dark** / **Clear Light**: the macOS Terminal profiles of the same name.
+  Terminal renders them slightly translucent; here the background is opaque.
 
 ## Usage
 
@@ -11,6 +15,8 @@ the integrated terminal match Ghostty exactly.
 "workbench.preferredDarkColorTheme": "Apple System Colors",
 "workbench.preferredLightColorTheme": "Apple System Colors Light"
 ```
+
+For the Clear themes, use `"Clear Dark"` and `"Clear Light"` instead.
 
 ## Development
 

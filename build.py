@@ -1,11 +1,14 @@
-"""Generate the VS Code color themes from the Ghostty palettes.
+"""Generate the VS Code color themes from the palettes in palettes.py.
 
 Run: python3 build.py
 """
 import json
 from pathlib import Path
 
-from palettes import DARK, DARK_GRAYS, LIGHT, LIGHT_GRAYS
+from palettes import (
+    CLEAR_DARK, CLEAR_DARK_GRAYS, CLEAR_LIGHT, CLEAR_LIGHT_GRAYS,
+    DARK, DARK_GRAYS, LIGHT, LIGHT_GRAYS,
+)
 
 ANSI_NAMES = [
     "Black", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan", "White",
@@ -27,7 +30,7 @@ def build(name, p, grays, dark):
     # normal ones, which read better on white.
     hue = a[9:15] if dark else a[1:7]
     red, green, yellow, blue, magenta, cyan = hue
-    comment = a[7]
+    comment = p.get("comment", a[7])
     muted = gray if dark else a[8]
 
     border = gray4
@@ -272,6 +275,8 @@ def build(name, p, grays, dark):
         "comment": comment,
     }
 
+    colors = {k: v for k, v in colors.items() if v is not None}
+
     return {
         "$schema": "vscode://schemas/color-theme",
         "name": name,
@@ -289,6 +294,8 @@ def main():
     for name, pal, grays, dark, fname in [
         ("Apple System Colors", DARK, DARK_GRAYS, True, "apple-system-colors-dark.json"),
         ("Apple System Colors Light", LIGHT, LIGHT_GRAYS, False, "apple-system-colors-light.json"),
+        ("Clear Dark", CLEAR_DARK, CLEAR_DARK_GRAYS, True, "clear-dark.json"),
+        ("Clear Light", CLEAR_LIGHT, CLEAR_LIGHT_GRAYS, False, "clear-light.json"),
     ]:
         (out / fname).write_text(json.dumps(build(name, pal, grays, dark), indent=2) + "\n")
         print(f"wrote themes/{fname}")
