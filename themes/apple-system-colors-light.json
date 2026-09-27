@@ -255,7 +255,7 @@
         "meta.function-call"
       ],
       "settings": {
-        "foreground": "#0869cb"
+        "foreground": "#479ec2"
       }
     },
     {
@@ -267,7 +267,7 @@
         "entity.other.inherited-class"
       ],
       "settings": {
-        "foreground": "#479ec2"
+        "foreground": "#0869cb"
       }
     },
     {
@@ -396,18 +396,18 @@
     "keyword": "#9647bf",
     "string": "#cc372e",
     "number": "#cdac08",
-    "function": "#0869cb",
-    "method": "#0869cb",
-    "type": "#479ec2",
-    "class": "#479ec2",
-    "interface": "#479ec2",
-    "enum": "#479ec2",
+    "function": "#479ec2",
+    "method": "#479ec2",
+    "type": "#0869cb",
+    "class": "#0869cb",
+    "interface": "#0869cb",
+    "enum": "#0869cb",
     "enumMember": "#cdac08",
     "property": "#26a439",
     "parameter": "#000000",
     "variable": "#000000",
     "variable.readonly": "#cdac08",
-    "*.defaultLibrary": "#479ec2",
+    "*.defaultLibrary": "#0869cb",
     "comment": "#98989d"
   }
 }

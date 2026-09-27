@@ -31,6 +31,9 @@ def build(name, p, grays, dark):
     hue = a[9:15] if dark else a[1:7]
     red, green, yellow, blue, magenta, cyan = hue
     comment = p.get("comment", a[7])
+    # Cyan is too faint on white for something as common as types; in light
+    # mode types take blue and functions, which are rarer, take cyan.
+    type_color, func_color = (cyan, blue) if dark else (blue, cyan)
     muted = gray if dark else a[8]
 
     border = gray4
@@ -236,9 +239,9 @@ def build(name, p, grays, dark):
         rule(["constant.character.escape", "string.regexp"], cyan),
         rule(["constant.numeric", "constant.language", "constant.language.boolean"], yellow),
         rule(["constant.other", "variable.other.constant", "support.constant"], yellow),
-        rule(["entity.name.function", "support.function", "meta.function-call"], blue),
+        rule(["entity.name.function", "support.function", "meta.function-call"], func_color),
         rule(["entity.name.type", "entity.name.class", "support.type", "support.class",
-              "entity.other.inherited-class"], cyan),
+              "entity.other.inherited-class"], type_color),
         rule(["variable", "variable.parameter"], fg),
         rule(["variable.language"], magenta),
         rule(["variable.other.property", "variable.other.object.property", "support.variable.property",
@@ -260,18 +263,18 @@ def build(name, p, grays, dark):
         "keyword": magenta,
         "string": red,
         "number": yellow,
-        "function": blue,
-        "method": blue,
-        "type": cyan,
-        "class": cyan,
-        "interface": cyan,
-        "enum": cyan,
+        "function": func_color,
+        "method": func_color,
+        "type": type_color,
+        "class": type_color,
+        "interface": type_color,
+        "enum": type_color,
         "enumMember": yellow,
         "property": green,
         "parameter": fg,
         "variable": fg,
         "variable.readonly": yellow,
-        "*.defaultLibrary": cyan,
+        "*.defaultLibrary": type_color,
         "comment": comment,
     }
 
