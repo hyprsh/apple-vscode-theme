@@ -54,6 +54,41 @@ If the theme doesn't switch, remove `"window.systemColorTheme"` from your
 settings; any value other than the default stops VS Code from seeing the
 system appearance.
 
+### Recommended settings
+
+The theme is designed for a minimal editor. These settings hide most of the
+chrome around the code:
+
+```jsonc
+// Editor
+"breadcrumbs.enabled": false,
+"editor.glyphMargin": false,
+"editor.guides.bracketPairs": false,
+"editor.guides.indentation": false,
+"editor.lightbulb.enabled": "off",
+"editor.lineNumbers": "off",
+"editor.minimap.enabled": false,
+"editor.renderLineHighlight": "none",
+"editor.scrollbar.horizontalScrollbarSize": 5,
+"editor.scrollbar.useShadows": false,
+"editor.scrollbar.verticalScrollbarSize": 10,
+"editor.showFoldingControls": "mouseover",
+"editor.stickyScroll.enabled": false,
+"scm.diffDecorations": "gutter",
+
+// Window
+"window.commandCenter": false,
+"workbench.activityBar.location": "hidden",
+"workbench.browser.showInTitleBar": false,
+"workbench.layoutControl.enabled": false,
+"workbench.navigationControl.enabled": false
+```
+
+With the activity bar hidden, open views from the command palette or with their
+shortcuts (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd> for the Explorer,
+<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> for Search). The scrollbar stays
+hidden until you hover over it.
+
 ## Ghostty
 
 Copy the theme files from the `ghostty` folder into Ghostty's themes folder:
@@ -75,6 +110,20 @@ For a Terminal-like translucent background, add:
 background-opacity = 0.95
 background-blur-radius = 20
 ```
+
+Recommended settings to go with it:
+
+```
+cursor-style = block
+shell-integration-features = no-cursor
+macos-titlebar-proxy-icon = hidden
+window-padding-balance = true
+window-padding-x = 4
+window-padding-y = 4
+```
+
+`no-cursor` stops Ghostty's shell integration from switching to a bar cursor at
+the prompt, so `cursor-style` applies there too.
 
 Ghostty already ships **Apple System Colors** and **Apple System Colors Light**,
 so there are no files for those here.
