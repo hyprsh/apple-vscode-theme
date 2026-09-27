@@ -288,6 +288,20 @@ def build(name, p, grays, dark):
     }
 
 
+def ghostty(p):
+    lines = [f"palette = {i}={c}" for i, c in enumerate(p["ansi"])]
+    lines += [
+        f"background = {p['background']}",
+        f"foreground = {p['foreground']}",
+        f"cursor-color = {p['cursor']}",
+        f"cursor-text = {p['cursor_text']}",
+        f"selection-background = {p['selection_bg']}",
+    ]
+    if p["selection_fg"]:
+        lines.append(f"selection-foreground = {p['selection_fg']}")
+    return "\n".join(lines) + "\n"
+
+
 def main():
     out = Path(__file__).parent / "themes"
     out.mkdir(exist_ok=True)
@@ -299,6 +313,13 @@ def main():
     ]:
         (out / fname).write_text(json.dumps(build(name, pal, grays, dark), indent=2) + "\n")
         print(f"wrote themes/{fname}")
+
+    # Ghostty already ships Apple System Colors; only the Clear themes are generated.
+    gh = Path(__file__).parent / "ghostty"
+    gh.mkdir(exist_ok=True)
+    for name, pal in [("Clear Dark", CLEAR_DARK), ("Clear Light", CLEAR_LIGHT)]:
+        (gh / name).write_text(ghostty(pal))
+        print(f"wrote ghostty/{name}")
 
 
 if __name__ == "__main__":

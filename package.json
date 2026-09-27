@@ -1,7 +1,7 @@
 {
-  "name": "apple-vscode-theme",
-  "displayName": "Apple System Colors",
-  "description": "Light and dark themes using Apple's terminal palettes: Ghostty's Apple System Colors and macOS Terminal's Clear Dark / Clear Light.",
+  "name": "clear-theme",
+  "displayName": "Clear Theme",
+  "description": "macOS Terminal's Clear Dark and Clear Light, plus Ghostty's Apple System Colors.",
   "version": "0.1.0",
   "publisher": "hyprsh",
   "engines": {
@@ -13,16 +13,6 @@
   "contributes": {
     "themes": [
       {
-        "label": "Apple System Colors",
-        "uiTheme": "vs-dark",
-        "path": "./themes/apple-system-colors-dark.json"
-      },
-      {
-        "label": "Apple System Colors Light",
-        "uiTheme": "vs",
-        "path": "./themes/apple-system-colors-light.json"
-      },
-      {
         "label": "Clear Dark",
         "uiTheme": "vs-dark",
         "path": "./themes/clear-dark.json"
@@ -31,12 +21,22 @@
         "label": "Clear Light",
         "uiTheme": "vs",
         "path": "./themes/clear-light.json"
+      },
+      {
+        "label": "Apple System Colors",
+        "uiTheme": "vs-dark",
+        "path": "./themes/apple-system-colors-dark.json"
+      },
+      {
+        "label": "Apple System Colors Light",
+        "uiTheme": "vs",
+        "path": "./themes/apple-system-colors-light.json"
       }
     ]
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hyprsh/apple-vscode-theme"
+    "url": "https://github.com/hyprsh/clear-theme"
   }
 }

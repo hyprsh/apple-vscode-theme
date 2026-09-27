@@ -1,21 +1,24 @@
-# Apple System Colors for VS Code
+# Clear Theme
 
-Light and dark VS Code themes built from Apple terminal palettes, so the editor
-and the integrated terminal match your terminal exactly:
+The macOS Terminal **Clear Dark** and **Clear Light** profiles for VS Code and
+Ghostty, so your editor and terminal look just like Terminal.app.
 
-- **Apple System Colors** / **Apple System Colors Light**: Ghostty's bundled
-  themes of the same name.
-- **Clear Dark** / **Clear Light**: the macOS Terminal profiles of the same name.
-  Terminal renders them slightly translucent; here the background is opaque.
+The colors are decoded straight from Terminal's own profiles. Terminal draws
+them slightly translucent; in VS Code the background is opaque.
 
-## Installation
+Also included, as a secondary pair: **Apple System Colors** and **Apple System
+Colors Light**, matching Ghostty's bundled themes of the same name.
+
+## VS Code
+
+### Installation
 
 The theme isn't on the VS Code Marketplace. Install it by cloning the repo into
 your VS Code extensions folder:
 
 ```sh
-git clone https://github.com/hyprsh/apple-vscode-theme.git \
-  ~/.vscode/extensions/hyprsh.apple-vscode-theme-0.1.0
+git clone https://github.com/hyprsh/clear-theme.git \
+  ~/.vscode/extensions/hyprsh.clear-theme-0.1.0
 ```
 
 Then restart VS Code (or run **Developer: Reload Window**) and pick a theme with
@@ -28,29 +31,30 @@ VS Code Insiders use `~/.vscode-insiders/extensions`, for VSCodium
 To update:
 
 ```sh
-git -C ~/.vscode/extensions/hyprsh.apple-vscode-theme-0.1.0 pull
+git -C ~/.vscode/extensions/hyprsh.clear-theme-0.1.0 pull
 ```
 
 To uninstall, delete that folder and reload VS Code.
 
-## Usage
+### Usage
 
 To switch between light and dark automatically with the system appearance,
 add this to your `settings.json`:
 
 ```jsonc
 "window.autoDetectColorScheme": true,
-"workbench.preferredDarkColorTheme": "Apple System Colors",
-"workbench.preferredLightColorTheme": "Apple System Colors Light"
+"workbench.preferredDarkColorTheme": "Clear Dark",
+"workbench.preferredLightColorTheme": "Clear Light"
 ```
 
-For the Clear themes, use `"Clear Dark"` and `"Clear Light"` instead.
+For the secondary themes, use `"Apple System Colors"` and
+`"Apple System Colors Light"` instead.
 
 If the theme doesn't switch, remove `"window.systemColorTheme"` from your
 settings; any value other than the default stops VS Code from seeing the
 system appearance.
 
-## Font (optional)
+### Font (optional)
 
 To match macOS Terminal's font too, use **SF Mono Terminal**, the SF Mono
 variant Terminal ships inside its app bundle. Other apps can't see it until you
@@ -74,18 +78,44 @@ Quit and reopen VS Code afterwards; a window reload doesn't pick up new fonts.
 The copies don't update with macOS, so re-run the `cp` after a major update if
 you want Terminal's latest version.
 
+## Ghostty
+
+Copy the theme files from the `ghostty` folder into Ghostty's themes folder:
+
+```sh
+mkdir -p ~/.config/ghostty/themes
+cp ghostty/* ~/.config/ghostty/themes/
+```
+
+Then set the theme in your Ghostty config:
+
+```
+theme = light:Clear Light,dark:Clear Dark
+```
+
+For a Terminal-like translucent background, add:
+
+```
+background-opacity = 0.95
+background-blur-radius = 20
+```
+
+Ghostty already ships **Apple System Colors** and **Apple System Colors Light**,
+so there are no files for those here.
+
 ## Development
 
-The theme JSON is generated; edit `palettes.py` or `build.py`, then:
+The VS Code and Ghostty themes are generated from `palettes.py`; edit it or
+`build.py`, then:
 
 ```sh
 python3 build.py
 ```
 
-To work on it, symlink your clone into the extensions folder instead and reload VS Code:
+To work on it, symlink your clone into the extensions folder and reload VS Code:
 
 ```sh
-ln -s "$PWD" ~/.vscode/extensions/hyprsh.apple-vscode-theme-0.1.0
+ln -s "$PWD" ~/.vscode/extensions/hyprsh.clear-theme-0.1.0
 ```
 
 ## License
