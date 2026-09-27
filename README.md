@@ -82,6 +82,7 @@ chrome around the code:
 "window.commandCenter": false,
 "workbench.activityBar.location": "hidden",
 "workbench.browser.showInTitleBar": false,
+"workbench.iconTheme": "vscode-modern-icons",
 "workbench.layoutControl.enabled": false,
 "workbench.navigationControl.enabled": false
 ```
