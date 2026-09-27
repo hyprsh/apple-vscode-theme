@@ -3,10 +3,7 @@
 The macOS Terminal **Clear Dark** and **Clear Light** profiles for VS Code and
 Ghostty, so your editor and terminal look just like Terminal.app.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="images/clear-dark.png">
-  <img alt="Clear Light and Clear Dark in VS Code" src="images/clear-light.png">
-</picture>
+![Clear Dark in front of Clear Light in VS Code](images/clear.png)
 
 The colors are decoded straight from Terminal's own profiles. Terminal draws
 them slightly translucent; in VS Code the background is opaque.
