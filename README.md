@@ -111,8 +111,6 @@ Ghostty config:
 ```
 font-family = SF Mono Terminal
 font-size = 16
-font-style = Medium
-font-style-italic = Medium Italic
 ```
 
 Quit and reopen VS Code afterwards; a window reload doesn't pick up new fonts.
