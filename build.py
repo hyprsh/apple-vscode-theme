@@ -54,7 +54,7 @@ def build(name, p, grays, dark):
         "textPreformat.foreground": cyan,
         "textBlockQuote.background": gray6 if not dark else gray5,
         "textCodeBlock.background": gray6 if not dark else gray5,
-        "scrollbarSlider.background": alpha(gray, 0x40),
+        "scrollbarSlider.background": "#00000000",
         "scrollbarSlider.hoverBackground": alpha(gray, 0x70),
         "scrollbarSlider.activeBackground": alpha(gray, 0x90),
 

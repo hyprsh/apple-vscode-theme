@@ -17,7 +17,7 @@
     "textPreformat.foreground": "#76d6ff",
     "textBlockQuote.background": "#2c2c2e",
     "textCodeBlock.background": "#2c2c2e",
-    "scrollbarSlider.background": "#8e8e9340",
+    "scrollbarSlider.background": "#00000000",
     "scrollbarSlider.hoverBackground": "#8e8e9370",
     "scrollbarSlider.activeBackground": "#8e8e9390",
     "titleBar.activeBackground": "#1e1e1e",
