@@ -3,3 +3,4 @@ palettes.py
 __pycache__/**
 .gitignore
 ghostty/**
+images/**
