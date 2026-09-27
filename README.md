@@ -63,3 +63,7 @@ To work on it, symlink your clone into the extensions folder instead and reload 
 ```sh
 ln -s "$PWD" ~/.vscode/extensions/hyprsh.apple-vscode-theme-0.1.0
 ```
+
+## License
+
+[MIT](LICENSE)
