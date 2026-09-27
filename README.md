@@ -50,6 +50,30 @@ If the theme doesn't switch, remove `"window.systemColorTheme"` from your
 settings; any value other than the default stops VS Code from seeing the
 system appearance.
 
+## Font (optional)
+
+To match macOS Terminal's font too, use **SF Mono Terminal**, the SF Mono
+variant Terminal ships inside its app bundle. Other apps can't see it until you
+copy it into your user fonts folder:
+
+```sh
+cp /System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SFMono*-Terminal.ttf \
+  ~/Library/Fonts/
+```
+
+Then set it in your `settings.json` (the integrated terminal inherits the
+editor font):
+
+```jsonc
+"editor.fontFamily": "'SF Mono Terminal', ui-monospace, Menlo, monospace",
+"editor.fontSize": 16,
+"terminal.integrated.fontSize": 16
+```
+
+Quit and reopen VS Code afterwards; a window reload doesn't pick up new fonts.
+The copies don't update with macOS, so re-run the `cp` after a major update if
+you want Terminal's latest version.
+
 ## Development
 
 The theme JSON is generated; edit `palettes.py` or `build.py`, then:
