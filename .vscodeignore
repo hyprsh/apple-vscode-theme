@@ -1,0 +1,4 @@
+build.py
+palettes.py
+__pycache__/**
+.gitignore

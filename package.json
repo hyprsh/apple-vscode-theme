@@ -1,0 +1,29 @@
+{
+  "name": "apple-vscode-theme",
+  "displayName": "Apple System Colors",
+  "description": "Light and dark themes using the exact Apple System Colors palettes from Ghostty.",
+  "version": "0.1.0",
+  "publisher": "hyprsh",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hyprsh/apple-vscode-theme"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": ["Themes"],
+  "contributes": {
+    "themes": [
+      {
+        "label": "Apple System Colors",
+        "uiTheme": "vs-dark",
+        "path": "./themes/apple-system-colors-dark.json"
+      },
+      {
+        "label": "Apple System Colors Light",
+        "uiTheme": "vs",
+        "path": "./themes/apple-system-colors-light.json"
+      }
+    ]
+  }
+}
