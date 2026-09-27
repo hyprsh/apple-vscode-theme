@@ -54,30 +54,6 @@ If the theme doesn't switch, remove `"window.systemColorTheme"` from your
 settings; any value other than the default stops VS Code from seeing the
 system appearance.
 
-### Font (optional)
-
-To match macOS Terminal's font too, use **SF Mono Terminal**, the SF Mono
-variant Terminal ships inside its app bundle. Other apps can't see it until you
-copy it into your user fonts folder:
-
-```sh
-cp /System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SFMono*-Terminal.ttf \
-  ~/Library/Fonts/
-```
-
-Then set it in your `settings.json` (the integrated terminal inherits the
-editor font):
-
-```jsonc
-"editor.fontFamily": "'SF Mono Terminal', ui-monospace, Menlo, monospace",
-"editor.fontSize": 16,
-"terminal.integrated.fontSize": 16
-```
-
-Quit and reopen VS Code afterwards; a window reload doesn't pick up new fonts.
-The copies don't update with macOS, so re-run the `cp` after a major update if
-you want Terminal's latest version.
-
 ## Ghostty
 
 Copy the theme files from the `ghostty` folder into Ghostty's themes folder:
@@ -102,6 +78,43 @@ background-blur-radius = 20
 
 Ghostty already ships **Apple System Colors** and **Apple System Colors Light**,
 so there are no files for those here.
+
+## Font (optional)
+
+To match macOS Terminal's font too, use **SF Mono Terminal**, the SF Mono
+variant Terminal ships inside its app bundle. It isn't installed for other apps,
+and copying the files into `~/Library/Fonts` isn't enough; install them with
+Font Book:
+
+```sh
+cp /System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SFMono*-Terminal.ttf /tmp/
+open -a "Font Book" /tmp/SFMono-Terminal.ttf /tmp/SFMonoItalic-Terminal.ttf
+```
+
+Click **Install** in Font Book, then check that "SF Mono Terminal" appears in
+its font list.
+
+VS Code `settings.json` (the integrated terminal inherits the editor font):
+
+```jsonc
+"editor.fontFamily": "'SF Mono Terminal', ui-monospace, Menlo, monospace",
+"editor.fontSize": 16,
+"editor.fontWeight": "500",
+"terminal.integrated.fontSize": 16
+```
+
+Ghostty config:
+
+```
+font-family = SF Mono Terminal
+font-size = 16
+font-style = Medium
+font-style-italic = Medium Italic
+```
+
+Quit and reopen VS Code afterwards; a window reload doesn't pick up new fonts.
+The installed copies don't update with macOS, so repeat the install after a
+major update if you want Terminal's latest version.
 
 ## Development
 
