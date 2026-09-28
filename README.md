@@ -1,7 +1,7 @@
 # Clear Theme
 
-The macOS Terminal **Clear Dark** and **Clear Light** profiles for VS Code and
-Ghostty, so your editor and terminal look just like Terminal.app.
+The macOS Terminal **Clear Dark** and **Clear Light** profiles for VS Code,
+Ghostty and hunk, so your editor and terminal look just like Terminal.app.
 
 ![Clear Dark in front of Clear Light in VS Code](images/clear.png)
 
@@ -131,6 +131,27 @@ the prompt, so `cursor-style` applies there too.
 Ghostty already ships **Apple System Colors** and **Apple System Colors Light**,
 so there are no files for those here.
 
+## hunk
+
+`hunk.ts` is a [hunk](https://hunk.dev) extension that adds **Clear Dark**
+(`clear-dark`) and **Clear Light** (`clear-light`), with the same diff and
+syntax colors as VS Code. Link it into hunk's extensions folder:
+
+```sh
+mkdir -p ~/.config/hunk/extensions
+ln -s "$PWD/hunk.ts" ~/.config/hunk/extensions/clear-theme.ts
+```
+
+Then pick one in `~/.config/hunk/config.toml`:
+
+```toml
+theme = "clear-dark"
+```
+
+hunk's `auto` theme only chooses between its own GitHub themes, so to follow
+the system appearance pass `--theme clear-dark` or `--theme clear-light` when
+starting hunk.
+
 ## Font (optional)
 
 To match macOS Terminal's font too, use **SF Mono Terminal**, the SF Mono
@@ -176,7 +197,7 @@ major update if you want Terminal's latest version.
 
 ## Development
 
-The VS Code and Ghostty themes are generated from `palettes.py`; edit it or
+The VS Code, Ghostty and hunk themes are generated from `palettes.py`; edit it or
 `build.py`, then:
 
 ```sh
