@@ -213,7 +213,7 @@
         "punctuation.definition.string"
       ],
       "settings": {
-        "foreground": "#b45648"
+        "foreground": "#6b767c"
       }
     },
     {
@@ -391,7 +391,7 @@
   ],
   "semanticTokenColors": {
     "keyword": "#ad64be",
-    "string": "#b45648",
+    "string": "#6b767c",
     "number": "#c4ac62",
     "function": "#69c6c9",
     "method": "#69c6c9",

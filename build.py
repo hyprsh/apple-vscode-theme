@@ -7,7 +7,7 @@ from pathlib import Path
 
 from palettes import (
     CLEAR_DARK, CLEAR_DARK_GRAYS, CLEAR_LIGHT, CLEAR_LIGHT_GRAYS,
-    DARK, DARK_GRAYS, LIGHT, LIGHT_GRAYS,
+    DARK, DARK_GRAYS, LIGHT, LIGHT_GRAYS, mix,
 )
 
 ANSI_NAMES = [
@@ -35,6 +35,8 @@ def build(name, p, grays, dark):
     # mode types take blue and functions, which are rarer, take cyan.
     type_color, func_color = (cyan, blue) if dark else (blue, cyan)
     muted = gray if dark else a[8]
+    # Strings are plain text, dimmed so they still stand apart from code.
+    string = mix(bg, fg, 0.75)
 
     border = gray4
     chrome = bg
@@ -235,7 +237,7 @@ def build(name, p, grays, dark):
         rule(["comment", "punctuation.definition.comment"], comment),
         rule(["keyword", "storage.type", "storage.modifier", "keyword.control"], magenta),
         rule(["keyword.operator"], fg),
-        rule(["string", "punctuation.definition.string"], red),
+        rule(["string", "punctuation.definition.string"], string),
         rule(["constant.character.escape", "string.regexp"], cyan),
         rule(["constant.numeric", "constant.language", "constant.language.boolean"], yellow),
         rule(["constant.other", "variable.other.constant", "support.constant"], yellow),
@@ -261,7 +263,7 @@ def build(name, p, grays, dark):
 
     semantic = {
         "keyword": magenta,
-        "string": red,
+        "string": string,
         "number": yellow,
         "function": func_color,
         "method": func_color,
