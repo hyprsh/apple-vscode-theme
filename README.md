@@ -7,9 +7,10 @@ Ghostty and herdr, so your editor and terminal look just like Terminal.app.
 
 The colors are decoded straight from Terminal's own profiles. Terminal draws
 them slightly translucent; in VS Code the background is opaque. One
-departure: Clear Light's green, yellow and cyan are hard to read on white, so
-the terminal gets them darker (blue and magenta slightly too), in the same
-hues the editor uses.
+departure: terminal colors that are hard to read on the background are
+darkened or lightened just enough to be readable, keeping their hue. In Clear
+Light that's most colors, and the normal ones take the hues the editor uses;
+in Clear Dark it's red and bright black.
 
 Also included, as a secondary pair: **Apple System Colors** and **Apple System
 Colors Light**, matching Ghostty's bundled themes of the same name.
@@ -138,9 +139,9 @@ so there are no files for those here.
 
 `herdr/clear.toml` gives [herdr](https://herdr.dev) Clear Light and Clear
 Dark, switching with the terminal's light/dark appearance. It sets every color
-herdr has, with the same grays, accent and hues as the VS Code theme; herdr's
-own `terminal` theme assumes a dark background and is hard to read in Clear
-Light.
+herdr has, with the same grays and hues as the VS Code theme and its accent,
+adjusted so the active tab's label stays readable; herdr's own `terminal`
+theme assumes a dark background and is hard to read in Clear Light.
 
 herdr can't include other files, so copy the file's contents into
 `~/.config/herdr/config.toml`, replacing any `[theme]` section there, then

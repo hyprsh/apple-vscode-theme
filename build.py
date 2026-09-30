@@ -50,15 +50,53 @@ def readable(color, bg, target=4.5, saturate=1.0):
     return hex_(l)
 
 
+def over(color, under):
+    """The opaque color that translucent color (#rrggbbaa) shows over under."""
+    a = int(color[7:9], 16) / 255
+    return "#" + "".join(
+        f"{round(int(color[i:i + 2], 16) * a + int(under[i:i + 2], 16) * (1 - a)):02x}"
+        for i in (1, 3, 5))
+
+
+def vivid(color):
+    """color's hue at full saturation, so even a faint tint of it shows."""
+    h, _, _ = colorsys.rgb_to_hls(*(int(color[i:i + 2], 16) / 255 for i in (1, 3, 5)))
+    return "#" + "".join(f"{round(x * 255):02x}" for x in colorsys.hls_to_rgb(h, 0.5, 1))
+
+
+def tint(color, under, texts, most, layers=1):
+    """color, translucent, at the strongest alpha up to most that keeps every
+    text color readable (4.5:1) on it, even stacked layers times over under."""
+    for a in range(most, 0, -1):
+        shown = under
+        for _ in range(layers):
+            shown = over(alpha(color, a), shown)
+        if all(contrast(t, shown) >= 4.5 for t in texts):
+            return alpha(color, a)
+    return alpha(color, 0)
+
+
 def terminal_ansi(p):
     """The ANSI colors as the terminal gets them. For palettes marked
-    readable_terminal, the six normal colors that are under 4.5:1 on the
-    background get the same readable hue the editor uses; bright colors stay."""
+    readable_terminal, every color under 4.5:1 on the background is adjusted
+    just enough to be readable, keeping its hue. Black and white are left
+    alone, as programs use them for backgrounds; bright black is included, as
+    it's the usual gray for dimmed text. In a light palette the six normal
+    colors take the editor's hues, and the rest get the same saturation
+    boost."""
     a = list(p["ansi"])
-    if p.get("readable_terminal"):
-        for i in range(1, 7):
-            if contrast(a[i], p["background"]) < 4.5:
-                a[i] = readable(a[i], p["background"], saturate=1.2)
+    if not p.get("readable_terminal"):
+        return a
+    bg = p["background"]
+    dark = luminance(bg) < 0.5
+    editor = [] if dark else hues(p, dark)
+    for i in range(16):
+        if i in (0, 7, 15) or contrast(a[i], bg) >= 4.5:
+            continue
+        if not dark and 1 <= i <= 6:
+            a[i] = editor[i - 1]
+        else:
+            a[i] = readable(a[i], bg, saturate=1.0 if dark else 1.2)
     return a
 
 
@@ -76,9 +114,10 @@ def hues(p, dark):
     which is too pale on white; it gets a saturation boost so the darker
     colors stay vivid."""
     a = p["ansi"]
+    selected = selection_gray(p, dark)
     if dark:
-        return [readable(c, selection_gray(p, dark)) for c in a[9:15]]
-    return [readable(c, p["background"], saturate=1.2) for c in a[1:7]]
+        return [readable(c, selected) for c in a[9:15]]
+    return [readable(c, selected, saturate=1.2) for c in a[1:7]]
 
 
 def accent_color(p, dark):
@@ -93,11 +132,9 @@ def build(name, p, grays, dark):
     bg, fg = p["background"], p["foreground"]
     gray, gray2, gray3, gray4, gray5, gray6 = grays
 
-    comment = p.get("comment", a[7])
-    if not dark:
-        comment = readable(comment, bg)
     selection = selection_gray(p, dark)
     red, green, yellow, blue, magenta, cyan = hues(p, dark)
+    comment = readable(p.get("comment", a[7]), selection)
     # Cyan is too faint on white for something as common as types; in light
     # mode types take blue and functions, which are rarer, take cyan.
     type_color, func_color = (cyan, blue) if dark else (blue, cyan)
@@ -110,6 +147,20 @@ def build(name, p, grays, dark):
     border = gray4
     chrome = bg
     hover = alpha(fg, 0x10)
+
+    # Code shows through the diff, find and bracket-match fills. Each fill is
+    # as strong as it can be, up to its designed alpha, while every code
+    # color on it stays readable; it uses the hue at full saturation so it
+    # still shows. Changed text is tinted on top of its changed line (and
+    # added or removed lines get both), so the line leaves room for it.
+    code = [fg, comment, red, green, yellow, blue, magenta, cyan]
+
+    def diff_fills(hue):
+        line = tint(vivid(hue), bg, code, 0x18, layers=2)
+        return line, tint(vivid(hue), over(line, bg), code, 0x30)
+
+    inserted_line, inserted_text = diff_fills(green)
+    removed_line, removed_text = diff_fills(red)
 
     colors = {
         "foreground": fg,
@@ -238,9 +289,9 @@ def build(name, p, grays, dark):
         "editor.wordHighlightBackground": alpha(selection, 0x60),
         "editor.wordHighlightStrongBackground": alpha(selection, 0x90),
         # Faint fill plus outline: the match stands out, the code stays readable.
-        "editor.findMatchBackground": alpha(yellow, 0x28),
+        "editor.findMatchBackground": tint(vivid(yellow), bg, code, 0x28),
         "editor.findMatchBorder": yellow,
-        "editor.findMatchHighlightBackground": alpha(yellow, 0x18),
+        "editor.findMatchHighlightBackground": tint(vivid(yellow), bg, code, 0x18),
         "editor.findMatchHighlightBorder": alpha(yellow, 0x80),
         "editor.lineHighlightBackground": alpha(fg, 0x0a),
         "editor.lineHighlightBorder": "#00000000",
@@ -250,7 +301,7 @@ def build(name, p, grays, dark):
         "editorIndentGuide.activeBackground1": gray2 if dark else gray3,
         "editorWhitespace.foreground": gray3 if dark else gray4,
         "editorRuler.foreground": gray4 if dark else gray5,
-        "editorBracketMatch.background": alpha(blue, 0x30),
+        "editorBracketMatch.background": tint(vivid(blue), bg, code, 0x30),
         "editorBracketMatch.border": "#00000000",
         "editorBracketHighlight.foreground1": blue,
         "editorBracketHighlight.foreground2": magenta,
@@ -272,10 +323,10 @@ def build(name, p, grays, dark):
         "editorOverviewRuler.findMatchForeground": yellow,
 
         # Diff
-        "diffEditor.insertedTextBackground": alpha(green, 0x30),
-        "diffEditor.removedTextBackground": alpha(red, 0x30),
-        "diffEditor.insertedLineBackground": alpha(green, 0x18),
-        "diffEditor.removedLineBackground": alpha(red, 0x18),
+        "diffEditor.insertedTextBackground": inserted_text,
+        "diffEditor.removedTextBackground": removed_text,
+        "diffEditor.insertedLineBackground": inserted_line,
+        "diffEditor.removedLineBackground": removed_line,
 
         # Git
         "gitDecoration.addedResourceForeground": green,
@@ -392,6 +443,9 @@ def herdr(p, grays, dark):
     muted = gray if dark else p["ansi"][8]
     if contrast(muted, row) < 4.5:
         muted = readable(muted, row)
+    # The active tab's label is surface_dim on the accent (panel_bg is reset),
+    # so the accent is adjusted until that label is readable.
+    accent = readable(accent_color(p, dark), gray4)
     return {
         "text": fg,
         "subtext0": muted,
@@ -405,7 +459,7 @@ def herdr(p, grays, dark):
         "surface0": gray5,
         "surface1": gray3,
         "surface_dim": gray4,
-        "accent": accent_color(p, dark),
+        "accent": accent,
         "blue": blue,
         "green": green,
         "yellow": yellow,

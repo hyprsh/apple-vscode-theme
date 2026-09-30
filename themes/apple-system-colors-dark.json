@@ -117,9 +117,9 @@
     "editor.selectionHighlightBackground": "#39393980",
     "editor.wordHighlightBackground": "#39393960",
     "editor.wordHighlightStrongBackground": "#39393990",
-    "editor.findMatchBackground": "#ffd60a28",
+    "editor.findMatchBackground": "#ffd40026",
     "editor.findMatchBorder": "#ffd60a",
-    "editor.findMatchHighlightBackground": "#ffd60a18",
+    "editor.findMatchHighlightBackground": "#ffd40018",
     "editor.findMatchHighlightBorder": "#ffd60a80",
     "editor.lineHighlightBackground": "#ffffff0a",
     "editor.lineHighlightBorder": "#00000000",
@@ -129,7 +129,7 @@
     "editorIndentGuide.activeBackground1": "#636366",
     "editorWhitespace.foreground": "#48484a",
     "editorRuler.foreground": "#3a3a3c",
-    "editorBracketMatch.background": "#4fa7ff30",
+    "editorBracketMatch.background": "#007fff30",
     "editorBracketMatch.border": "#00000000",
     "editorBracketHighlight.foreground1": "#4fa7ff",
     "editorBracketHighlight.foreground2": "#d085f5",
@@ -149,10 +149,10 @@
     "editorOverviewRuler.errorForeground": "#ff7a72",
     "editorOverviewRuler.warningForeground": "#ffd60a",
     "editorOverviewRuler.findMatchForeground": "#ffd60a",
-    "diffEditor.insertedTextBackground": "#32d74b30",
-    "diffEditor.removedTextBackground": "#ff7a7230",
-    "diffEditor.insertedLineBackground": "#32d74b18",
-    "diffEditor.removedLineBackground": "#ff7a7218",
+    "diffEditor.insertedTextBackground": "#00ff2715",
+    "diffEditor.removedTextBackground": "#ff0e0030",
+    "diffEditor.insertedLineBackground": "#00ff2714",
+    "diffEditor.removedLineBackground": "#ff0e0018",
     "gitDecoration.addedResourceForeground": "#32d74b",
     "gitDecoration.untrackedResourceForeground": "#32d74b",
     "gitDecoration.modifiedResourceForeground": "#4fa7ff",
@@ -189,7 +189,7 @@
         "punctuation.definition.comment"
       ],
       "settings": {
-        "foreground": "#98989d"
+        "foreground": "#a2a2a7"
       }
     },
     {
@@ -409,6 +409,6 @@
     "variable": "#ffffff",
     "variable.readonly": "#ffd60a",
     "*.defaultLibrary": "#76d6ff",
-    "comment": "#98989d"
+    "comment": "#a2a2a7"
   }
 }

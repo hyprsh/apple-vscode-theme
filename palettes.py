@@ -43,8 +43,10 @@ def mix(a, b, t):
 
 
 def tinted_grays(bg, fg):
-    """UI grays blended from the theme's own background and foreground."""
-    return [mix(bg, fg, t) for t in (0.50, 0.36, 0.24, 0.16, 0.09, 0.04)]
+    """UI grays blended from the theme's own background and foreground. The
+    first is Clear Dark's secondary text; at 0.58 it's 5:1 on the background
+    (half-way, 0.50, is only 4.1:1)."""
+    return [mix(bg, fg, t) for t in (0.58, 0.36, 0.24, 0.16, 0.09, 0.04)]
 
 
 # Palettes decoded from macOS Terminal's "Clear Dark" and "Clear Light"
@@ -64,6 +66,9 @@ CLEAR_DARK = {
     "selection_bg": "#334e5e",
     "selection_fg": None,
     "comment": mix("#212734", "#e6e6e6", 0.5),
+    # Terminal's red and bright black are hard to read on this background;
+    # build.py lightens them for the terminal.
+    "readable_terminal": True,
 }
 
 CLEAR_LIGHT = {
@@ -78,8 +83,8 @@ CLEAR_LIGHT = {
     "selection_bg": "#e5ecf1",
     "selection_fg": None,
     "comment": mix("#ffffff", "#3a4851", 0.5),
-    # Terminal's green, yellow and cyan are hard to read on white; build.py
-    # darkens them (and blue and magenta a little) for the terminal.
+    # Most of Terminal's colors are hard to read on white; build.py darkens
+    # them for the terminal.
     "readable_terminal": True,
 }
 
