@@ -381,7 +381,7 @@ def ghostty(p):
 def herdr(p, grays, dark):
     """herdr's colors for one appearance: every token of its palette, with
     the VS Code theme's grays, accent and hues."""
-    bg, fg = p["background"], p["foreground"]
+    fg = p["foreground"]
     gray, gray2, gray3, gray4, gray5, gray6 = grays
     red, green, yellow, blue, magenta, cyan = hues(p, dark)
     # The current row takes the terminal's selection color; the neutral
@@ -399,7 +399,7 @@ def herdr(p, grays, dark):
         "overlay1": muted,
         "mauve": muted,
         "sidebar_bg": "reset",
-        "panel_bg": bg,
+        "panel_bg": "reset",
         "active_row_bg": row,
         "selection_bg": row,
         "surface0": gray5,
@@ -419,11 +419,11 @@ def herdr(p, grays, dark):
 HERDR_NOTES = {
     "subtext0": "secondary text: headers, hints, branch names",
     "sidebar_bg": "keep the window's translucent background",
-    "panel_bg": "tab bar, status line, popups; text on accent",
+    "panel_bg": "tab bar, status line, popups: translucent too",
     "active_row_bg": "current space/agent: the terminal's selection",
     "selection_bg": "cursor row while navigating",
     "surface1": "dragged row, search matches, popup dividers",
-    "surface_dim": "divider lines",
+    "surface_dim": "divider lines; text on accent, as panel_bg is reset",
     "accent": "active tab, key hints",
     "green": "idle",
     "yellow": "working",
