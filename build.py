@@ -49,6 +49,18 @@ def readable(color, bg, target=4.5, saturate=1.0):
     return hex_(l)
 
 
+def terminal_ansi(p):
+    """The ANSI colors as the terminal gets them. For palettes marked
+    readable_terminal, the six normal colors that are under 4.5:1 on the
+    background get the same readable hue the editor uses; bright colors stay."""
+    a = list(p["ansi"])
+    if p.get("readable_terminal"):
+        for i in range(1, 7):
+            if contrast(a[i], p["background"]) < 4.5:
+                a[i] = readable(a[i], p["background"], saturate=1.2)
+    return a
+
+
 def build(name, p, grays, dark):
     a = p["ansi"]
     bg, fg = p["background"], p["foreground"]
@@ -260,7 +272,7 @@ def build(name, p, grays, dark):
         "gitDecoration.conflictingResourceForeground": magenta,
         "gitDecoration.ignoredResourceForeground": muted,
 
-        # Terminal: exact Ghostty colors
+        # Terminal: the same colors as the Ghostty theme
         "terminal.background": bg,
         "terminal.foreground": fg,
         "terminalCursor.foreground": p["cursor"],
@@ -268,8 +280,8 @@ def build(name, p, grays, dark):
         "terminal.selectionBackground": p["selection_bg"],
         "terminal.selectionForeground": p["selection_fg"],
     }
-    for i, n in enumerate(ANSI_NAMES):
-        colors[f"terminal.ansi{n}"] = a[i]
+    for n, c in zip(ANSI_NAMES, terminal_ansi(p)):
+        colors[f"terminal.ansi{n}"] = c
 
     def rule(scope, color=None, style=None):
         s = {}
@@ -340,7 +352,7 @@ def build(name, p, grays, dark):
 
 
 def ghostty(p):
-    lines = [f"palette = {i}={c}" for i, c in enumerate(p["ansi"])]
+    lines = [f"palette = {i}={c}" for i, c in enumerate(terminal_ansi(p))]
     lines += [
         f"background = {p['background']}",
         f"foreground = {p['foreground']}",

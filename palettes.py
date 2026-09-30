@@ -75,6 +75,9 @@ CLEAR_LIGHT = {
     "selection_bg": "#e5ecf1",
     "selection_fg": None,
     "comment": mix("#ffffff", "#3a4851", 0.5),
+    # Terminal's green, yellow and cyan are hard to read on white; build.py
+    # darkens them (and blue and magenta a little) for the terminal.
+    "readable_terminal": True,
 }
 
 CLEAR_DARK_GRAYS = tinted_grays(CLEAR_DARK["background"], CLEAR_DARK["foreground"])

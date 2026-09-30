@@ -6,7 +6,10 @@ Ghostty, so your editor and terminal look just like Terminal.app.
 ![Clear Dark in front of Clear Light in VS Code](images/clear.png)
 
 The colors are decoded straight from Terminal's own profiles. Terminal draws
-them slightly translucent; in VS Code the background is opaque.
+them slightly translucent; in VS Code the background is opaque. One
+departure: Clear Light's green, yellow and cyan are hard to read on white, so
+the terminal gets them darker (blue and magenta slightly too), in the same
+hues the editor uses.
 
 Also included, as a secondary pair: **Apple System Colors** and **Apple System
 Colors Light**, matching Ghostty's bundled themes of the same name.
