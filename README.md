@@ -1,7 +1,8 @@
 # Clear Theme
 
 The macOS Terminal **Clear Dark** and **Clear Light** profiles for VS Code,
-Ghostty and herdr, so your editor and terminal look just like Terminal.app.
+Ghostty, herdr and tuicr, so your editor and terminal look just like
+Terminal.app.
 
 ![Clear Dark in front of Clear Light in VS Code](images/clear.png)
 
@@ -153,6 +154,29 @@ herdr server reload-config
 
 Picking a theme in herdr's Settings turns off the automatic switching.
 
+## tuicr
+
+`tuicr/` has Clear Light and Clear Dark for [tuicr](https://tuicr.dev), with
+the VS Code theme's colors: its grays, accent and hues, its syntax colors (in
+the `.tmTheme` files) and its changed-line fills, made opaque. Copy the folder's
+files into tuicr's themes folder:
+
+```sh
+mkdir -p ~/.config/tuicr/themes
+cp tuicr/* ~/.config/tuicr/themes/
+```
+
+Then pick them in `~/.config/tuicr/config.toml`; tuicr takes the one that
+matches the macOS appearance when it starts:
+
+```toml
+theme_light = "clear-light"
+theme_dark = "clear-dark"
+```
+
+tuicr keeps the terminal's background (`transparent_background`, on by
+default), so a translucent window stays translucent.
+
 ## Font (optional)
 
 To match macOS Terminal's font too, use **SF Mono Terminal**, the SF Mono
@@ -198,8 +222,8 @@ major update if you want Terminal's latest version.
 
 ## Development
 
-The VS Code, Ghostty and herdr themes are generated from `palettes.py`; edit
-it or `build.py`, then:
+The VS Code, Ghostty, herdr and tuicr themes are generated from
+`palettes.py`; edit it or `build.py`, then:
 
 ```sh
 python3 build.py
