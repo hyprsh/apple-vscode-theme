@@ -1,4 +1,5 @@
-"""Generate the VS Code color themes from the palettes in palettes.py.
+"""Generate the VS Code, Ghostty and herdr themes from the palettes in
+palettes.py.
 
 Run: python3 build.py
 """
@@ -61,36 +62,48 @@ def terminal_ansi(p):
     return a
 
 
+def selection_gray(p, dark):
+    """Selected list rows and selected code get a neutral gray, so colored
+    text (git status, syntax) keeps its contrast on them."""
+    return mix(p["background"], p["foreground"], 0.12 if dark else 0.08)
+
+
+def hues(p, dark):
+    """Red, green, yellow, blue, magenta and cyan for colored text. Dark mode
+    uses the bright (Apple dark-appearance) hues, light mode the normal ones,
+    which read better on white. Each is adjusted just enough to stay
+    readable, even on a selected row. This mostly darkens the light palette,
+    which is too pale on white; it gets a saturation boost so the darker
+    colors stay vivid."""
+    a = p["ansi"]
+    if dark:
+        return [readable(c, selection_gray(p, dark)) for c in a[9:15]]
+    return [readable(c, p["background"], saturate=1.2) for c in a[1:7]]
+
+
+def accent_color(p, dark):
+    """Filled accent (buttons, badges, menu selection). White on the bright
+    dark-mode blue is too faint, so dark mode puts dark text on it; light
+    mode darkens the blue under white text instead."""
+    return p["ansi"][12] if dark else readable(p["ansi"][12], "#ffffff")
+
+
 def build(name, p, grays, dark):
     a = p["ansi"]
     bg, fg = p["background"], p["foreground"]
     gray, gray2, gray3, gray4, gray5, gray6 = grays
 
-    # Dark mode uses the bright (Apple dark-appearance) hues, light mode the
-    # normal ones, which read better on white.
-    hue = a[9:15] if dark else a[1:7]
     comment = p.get("comment", a[7])
-    # Selected list rows and selected code get a neutral gray, so colored text
-    # (git status, syntax) keeps its contrast on them.
-    selection = mix(bg, fg, 0.12 if dark else 0.08)
-    # Adjust each hue just enough to stay readable, even on a selected row.
-    # This mostly darkens the light palette, which is too pale on white; it
-    # gets a saturation boost so the darker colors stay vivid.
-    if dark:
-        hue = [readable(c, selection) for c in hue]
-    else:
-        hue = [readable(c, bg, saturate=1.2) for c in hue]
+    if not dark:
         comment = readable(comment, bg)
-    red, green, yellow, blue, magenta, cyan = hue
+    selection = selection_gray(p, dark)
+    red, green, yellow, blue, magenta, cyan = hues(p, dark)
     # Cyan is too faint on white for something as common as types; in light
     # mode types take blue and functions, which are rarer, take cyan.
     type_color, func_color = (cyan, blue) if dark else (blue, cyan)
     muted = gray if dark else a[8]
 
-    # Filled accent (buttons, badges, menu selection). White on the bright
-    # dark-mode blue is too faint, so dark mode puts dark text on it; light
-    # mode darkens the blue under white text instead.
-    accent = a[12] if dark else readable(a[12], "#ffffff")
+    accent = accent_color(p, dark)
     on_accent = bg if dark else "#ffffff"
     accent_hover = a[4] if dark else mix(accent, "#000000", 0.15)
 
@@ -365,6 +378,80 @@ def ghostty(p):
     return "\n".join(lines) + "\n"
 
 
+def herdr(p, grays, dark):
+    """herdr's colors for one appearance: every token of its palette, with
+    the VS Code theme's grays, accent and hues."""
+    bg, fg = p["background"], p["foreground"]
+    gray, gray2, gray3, gray4, gray5, gray6 = grays
+    red, green, yellow, blue, magenta, cyan = hues(p, dark)
+    # The current row takes the terminal's selection color; the neutral
+    # selection gray is too faint to mark it on a translucent window.
+    row = p["selection_bg"]
+    # Secondary text: the VS Code theme's muted gray, lightened where it
+    # isn't readable on the current row.
+    muted = gray if dark else p["ansi"][8]
+    if contrast(muted, row) < 4.5:
+        muted = readable(muted, row)
+    return {
+        "text": fg,
+        "subtext0": muted,
+        "overlay0": muted,
+        "overlay1": muted,
+        "mauve": muted,
+        "sidebar_bg": "reset",
+        "panel_bg": bg,
+        "active_row_bg": row,
+        "selection_bg": row,
+        "surface0": gray5,
+        "surface1": gray3,
+        "surface_dim": gray4,
+        "accent": accent_color(p, dark),
+        "blue": blue,
+        "green": green,
+        "yellow": yellow,
+        "red": red,
+        "teal": cyan,
+        "peach": yellow,
+    }
+
+
+# What herdr uses each token for, noted once, on the light block.
+HERDR_NOTES = {
+    "subtext0": "secondary text: headers, hints, branch names",
+    "sidebar_bg": "keep the window's translucent background",
+    "panel_bg": "tab bar, status line, popups; text on accent",
+    "active_row_bg": "current space/agent: the terminal's selection",
+    "selection_bg": "cursor row while navigating",
+    "surface1": "dragged row, search matches, popup dividers",
+    "surface_dim": "divider lines",
+    "accent": "active tab, key hints",
+    "green": "idle",
+    "yellow": "working",
+    "red": "blocked",
+    "teal": "done",
+    "peach": "interrupted",
+}
+
+
+def herdr_toml(light, dark):
+    lines = [
+        "# Clear Light and Clear Dark for herdr (https://herdr.dev), generated by",
+        "# clear-theme's build.py. herdr switches between them with the terminal's",
+        "# appearance. Every color is set, so nothing falls back to the \"terminal\"",
+        "# base theme, which assumes a dark background.",
+        "[theme]",
+        'name = "terminal"',
+        "auto_switch = true",
+    ]
+    for mode, colors in (("light", light), ("dark", dark)):
+        lines += ["", f"[theme.custom.{mode}]"]
+        for key, color in colors.items():
+            line = f'{key} = "{color}"'
+            note = HERDR_NOTES.get(key) if mode == "light" else None
+            lines.append(f"{line:<25}  # {note}" if note else line)
+    return "\n".join(lines) + "\n"
+
+
 def main():
     out = Path(__file__).parent / "themes"
     out.mkdir(exist_ok=True)
@@ -383,6 +470,14 @@ def main():
     for name, pal in [("Clear Dark", CLEAR_DARK), ("Clear Light", CLEAR_LIGHT)]:
         (gh / name).write_text(ghostty(pal))
         print(f"wrote ghostty/{name}")
+
+    hd = Path(__file__).parent / "herdr"
+    hd.mkdir(exist_ok=True)
+    (hd / "clear.toml").write_text(herdr_toml(
+        herdr(CLEAR_LIGHT, CLEAR_LIGHT_GRAYS, False),
+        herdr(CLEAR_DARK, CLEAR_DARK_GRAYS, True),
+    ))
+    print("wrote herdr/clear.toml")
 
 
 if __name__ == "__main__":

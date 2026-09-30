@@ -1,7 +1,7 @@
 # Clear Theme
 
-The macOS Terminal **Clear Dark** and **Clear Light** profiles for VS Code and
-Ghostty, so your editor and terminal look just like Terminal.app.
+The macOS Terminal **Clear Dark** and **Clear Light** profiles for VS Code,
+Ghostty and herdr, so your editor and terminal look just like Terminal.app.
 
 ![Clear Dark in front of Clear Light in VS Code](images/clear.png)
 
@@ -134,6 +134,24 @@ the prompt, so `cursor-style` applies there too.
 Ghostty already ships **Apple System Colors** and **Apple System Colors Light**,
 so there are no files for those here.
 
+## herdr
+
+`herdr/clear.toml` gives [herdr](https://herdr.dev) Clear Light and Clear
+Dark, switching with the terminal's light/dark appearance. It sets every color
+herdr has, with the same grays, accent and hues as the VS Code theme; herdr's
+own `terminal` theme assumes a dark background and is hard to read in Clear
+Light.
+
+herdr can't include other files, so copy the file's contents into
+`~/.config/herdr/config.toml`, replacing any `[theme]` section there, then
+reload:
+
+```sh
+herdr server reload-config
+```
+
+Picking a theme in herdr's Settings turns off the automatic switching.
+
 ## Font (optional)
 
 To match macOS Terminal's font too, use **SF Mono Terminal**, the SF Mono
@@ -179,8 +197,8 @@ major update if you want Terminal's latest version.
 
 ## Development
 
-The VS Code and Ghostty themes are generated from `palettes.py`; edit it or
-`build.py`, then:
+The VS Code, Ghostty and herdr themes are generated from `palettes.py`; edit
+it or `build.py`, then:
 
 ```sh
 python3 build.py
