@@ -1,5 +1,8 @@
-"""Palettes copied verbatim from Ghostty's bundled themes
-("Apple System Colors" and "Apple System Colors Light")."""
+"""Source palettes for the themes: Clear Dark and Clear Light decoded from
+macOS Terminal's profiles, and Apple System Colors (Light) copied verbatim
+from Ghostty's bundled themes."""
+
+# Ghostty's "Apple System Colors" and "Apple System Colors Light", verbatim.
 
 DARK = {
     "ansi": [

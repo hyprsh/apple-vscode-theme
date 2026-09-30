@@ -187,7 +187,7 @@ def build(name, p, grays, dark):
         "list.highlightForeground": blue,
         "list.errorForeground": red,
         "list.warningForeground": yellow,
-        "tree.indentGuidesStroke": gray3 if dark else gray3,
+        "tree.indentGuidesStroke": gray3,
 
         # Inputs, buttons, dropdowns
         "input.background": gray5 if dark else "#ffffff",
@@ -244,7 +244,7 @@ def build(name, p, grays, dark):
         "editor.findMatchHighlightBorder": alpha(yellow, 0x80),
         "editor.lineHighlightBackground": alpha(fg, 0x0a),
         "editor.lineHighlightBorder": "#00000000",
-        "editorLineNumber.foreground": gray2 if dark else gray2,
+        "editorLineNumber.foreground": gray2,
         "editorLineNumber.activeForeground": fg,
         "editorIndentGuide.background1": gray4 if dark else gray5,
         "editorIndentGuide.activeBackground1": gray2 if dark else gray3,
