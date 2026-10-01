@@ -1,7 +1,7 @@
 # Clear Theme
 
 The macOS Terminal **Clear Dark** and **Clear Light** profiles for VS Code,
-Ghostty, herdr and tuicr, so your editor and terminal look just like
+Ghostty, herdr, tuicr and Neovim, so your editor and terminal look just like
 Terminal.app.
 
 ![Clear Dark in front of Clear Light in VS Code](images/clear.png)
@@ -177,6 +177,56 @@ theme_dark = "clear-dark"
 tuicr keeps the terminal's background (`transparent_background`, on by
 default), so a translucent window stays translucent.
 
+## Neovim
+
+The repo is also a Neovim plugin with one colorscheme, `clear`: Clear Light
+when `'background'` is `light`, Clear Dark when it's `dark`. Neovim sets
+`'background'` from the terminal's background color, so with the Ghostty
+theme above it follows the macOS appearance, and from Neovim 0.11 it switches
+while running too. It has the VS Code theme's syntax colors and grays, sets
+the terminal colors for `:terminal`, and covers the plugins
+[LazyVim](https://www.lazyvim.org) comes with. It needs Neovim 0.10 or
+later.
+
+With [lazy.nvim](https://github.com/folke/lazy.nvim):
+
+```lua
+{
+  "hyprsh/clear-theme",
+  lazy = false,
+  priority = 1000,
+  config = function()
+    vim.cmd.colorscheme("clear")
+  end,
+}
+```
+
+In LazyVim, add a file such as `lua/plugins/colorscheme.lua`:
+
+```lua
+return {
+  { "hyprsh/clear-theme", lazy = true, priority = 1000 },
+  { "LazyVim/LazyVim", opts = { colorscheme = "clear" } },
+}
+```
+
+Don't set `'background'` in your config, or Neovim stops following the
+terminal.
+
+[lualine](https://github.com/nvim-lualine/lualine.nvim)'s `auto` theme
+(LazyVim's default) picks up the matching statusline theme. For tabs on the
+background like VS Code's, without a darker tab bar, use bufferline's minimal
+preset:
+
+```lua
+{
+  "akinsho/bufferline.nvim",
+  opts = function(_, opts)
+    opts.options.style_preset = require("bufferline").style_preset.minimal
+  end,
+}
+```
+
 ## Font (optional)
 
 To match macOS Terminal's font too, use **SF Mono Terminal**, the SF Mono
@@ -222,7 +272,7 @@ major update if you want Terminal's latest version.
 
 ## Development
 
-The VS Code, Ghostty, herdr and tuicr themes are generated from
+The VS Code, Ghostty, herdr, tuicr and Neovim themes are generated from
 `palettes.py`; edit it or `build.py`, then:
 
 ```sh

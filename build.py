@@ -1,5 +1,5 @@
-"""Generate the VS Code, Ghostty, herdr and tuicr themes from the palettes in
-palettes.py.
+"""Generate the VS Code, Ghostty, herdr, tuicr and Neovim themes from the
+palettes in palettes.py.
 
 Run: python3 build.py
 """
@@ -77,6 +77,16 @@ def tint(color, under, texts, most, layers=1):
     return alpha(color, 0)
 
 
+def diff_fills(hue, bg, code):
+    """The changed-line and changed-text fills for hue. Each is as strong as
+    it can be, up to its designed alpha, while every code color on it stays
+    readable; it uses the hue at full saturation so it still shows. Changed
+    text is tinted on top of its changed line (and added or removed lines get
+    both), so the line leaves room for it."""
+    line = tint(vivid(hue), bg, code, 0x18, layers=2)
+    return line, tint(vivid(hue), over(line, bg), code, 0x30)
+
+
 def terminal_ansi(p):
     """The ANSI colors as the terminal gets them. For palettes marked
     readable_terminal, every color under 4.5:1 on the background is adjusted
@@ -149,19 +159,11 @@ def build(name, p, grays, dark):
     chrome = bg
     hover = alpha(fg, 0x10)
 
-    # Code shows through the diff, find and bracket-match fills. Each fill is
-    # as strong as it can be, up to its designed alpha, while every code
-    # color on it stays readable; it uses the hue at full saturation so it
-    # still shows. Changed text is tinted on top of its changed line (and
-    # added or removed lines get both), so the line leaves room for it.
+    # Code shows through the diff, find and bracket-match fills, so each is
+    # only as strong as keeps every code color readable on it.
     code = [fg, comment, red, green, yellow, blue, magenta, cyan]
-
-    def diff_fills(hue):
-        line = tint(vivid(hue), bg, code, 0x18, layers=2)
-        return line, tint(vivid(hue), over(line, bg), code, 0x30)
-
-    inserted_line, inserted_text = diff_fills(green)
-    removed_line, removed_text = diff_fills(red)
+    inserted_line, inserted_text = diff_fills(green, bg, code)
+    removed_line, removed_text = diff_fills(red, bg, code)
 
     colors = {
         "foreground": fg,
@@ -612,6 +614,345 @@ def tmtheme(vs):
     return plistlib.dumps({"name": vs["name"], "settings": rules}).decode()
 
 
+def nvim(vs, p, grays, dark):
+    """Neovim's highlight groups for one theme, with the VS Code theme vs's
+    colors. Neovim can't draw translucent colors, so the VS Code theme's
+    translucent fills are flattened onto the background. Groups that are the
+    same in both themes are links, in NVIM_LINKS."""
+    c, sem = vs["colors"], vs["semanticTokenColors"]
+    bg, fg = p["background"], p["foreground"]
+    gray, gray2, gray3, gray4, gray5, gray6 = grays
+    red, green, yellow, blue, magenta, cyan = hues(p, dark)
+    comment, func, type_ = sem["comment"], sem["function"], sem["type"]
+    muted = c["descriptionForeground"]
+    accent, on_accent = c["button.background"], c["button.foreground"]
+    selection = c["editor.selectionBackground"]
+    line = over(c["editor.lineHighlightBackground"], bg)
+    # Floats (completion, hover, pickers) often have no border, so they get
+    # a faint fill, the VS Code theme's widget gray. Their current row takes
+    # the terminal's selection color, as in herdr: the neutral selection gray
+    # is too faint on a translucent window.
+    float_bg = gray6
+    row = p["selection_bg"]
+    # Box-drawing borders are thin, so they're a step darker than VS Code's.
+    border = gray3
+
+    code = [fg, comment, red, green, yellow, blue, magenta, cyan]
+    add_line, _ = diff_fills(green, bg, code)
+    delete_line, _ = diff_fills(red, bg, code)
+    change_line, change_text = diff_fills(blue, bg, code)
+    change_line = over(change_line, bg)
+
+    def on(color):
+        return max((bg, fg), key=lambda t: contrast(t, color))
+
+    def kinds(color, *names):
+        return {f"BlinkCmpKind{n}": {"fg": color} for n in names}
+
+    return {
+        # Editor
+        "Normal": {"fg": fg, "bg": bg},
+        "NormalFloat": {"fg": fg, "bg": float_bg},
+        "FloatBorder": {"fg": border, "bg": float_bg},
+        "FloatTitle": {"fg": fg, "bg": float_bg, "bold": True},
+        "FloatFooter": {"fg": muted, "bg": float_bg},
+        "Cursor": {"fg": p["cursor_text"], "bg": p["cursor"]},
+        "CursorLine": {"bg": line},
+        "ColorColumn": {"bg": line},
+        "Folded": {"fg": muted, "bg": line},
+        "LineNr": {"fg": c["editorLineNumber.foreground"]},
+        "CursorLineNr": {"fg": c["editorLineNumber.activeForeground"]},
+        "SignColumn": {"fg": c["editorLineNumber.foreground"]},
+        "FoldColumn": {"fg": c["editorLineNumber.foreground"]},
+        # Plugins use NonText for dimmed text (paths, counts, hidden files),
+        # so it's as readable as line numbers; only whitespace is fainter.
+        "NonText": {"fg": c["editorLineNumber.foreground"]},
+        "Whitespace": {"fg": c["editorWhitespace.foreground"]},
+        "Conceal": {"fg": muted},
+        "Directory": {"fg": blue},
+        "Title": {"fg": blue, "bold": True},
+        "Visual": {"bg": selection},
+        "Search": {"bg": over(c["editor.findMatchBackground"], bg)},
+        # The current match gets the solid color VS Code gives its outline.
+        "CurSearch": {"fg": on(yellow), "bg": yellow},
+        "Substitute": {"fg": on(red), "bg": red},
+        "MatchParen": {"fg": blue, "bg": over(c["editorBracketMatch.background"], bg),
+                       "bold": True},
+        "Pmenu": {"fg": fg, "bg": float_bg},
+        "PmenuSel": {"bg": row},
+        "PmenuMatch": {"fg": blue, "bold": True},
+        "PmenuMatchSel": {"fg": blue, "bold": True},
+        "PmenuKind": {"fg": muted},
+        "PmenuExtra": {"fg": muted},
+        "PmenuSbar": {"bg": float_bg},
+        "PmenuThumb": {"bg": border},
+        "StatusLine": {"fg": muted, "bg": bg},
+        "StatusLineNC": {"fg": gray2, "bg": bg},
+        "WinBar": {"fg": fg, "bold": True},
+        "WinBarNC": {"fg": muted},
+        "TabLine": {"fg": muted, "bg": bg},
+        "TabLineFill": {"bg": bg},
+        "TabLineSel": {"fg": fg, "bg": bg, "bold": True},
+        "WinSeparator": {"fg": border},
+        "QuickFixLine": {"bg": row},
+        "WildMenu": {"bg": row},
+        "ModeMsg": {"fg": fg, "bold": True},
+        "MoreMsg": {"fg": blue},
+        "Question": {"fg": blue},
+        "ErrorMsg": {"fg": red},
+        "WarningMsg": {"fg": yellow},
+        "SpellBad": {"sp": red, "undercurl": True},
+        "SpellCap": {"sp": yellow, "undercurl": True},
+        "SpellLocal": {"sp": blue, "undercurl": True},
+        "SpellRare": {"sp": magenta, "undercurl": True},
+
+        # Diff: added and removed lines take the VS Code line fills, changed
+        # lines the same fill in blue, with their changed text on top.
+        "DiffAdd": {"bg": over(add_line, bg)},
+        "DiffDelete": {"fg": border, "bg": over(delete_line, bg)},
+        "DiffChange": {"bg": change_line},
+        "DiffText": {"bg": over(change_text, change_line)},
+        "Added": {"fg": green},
+        "Changed": {"fg": blue},
+        "Removed": {"fg": red},
+
+        # Syntax, as in the VS Code theme's token colors
+        "Comment": {"fg": comment},
+        "Constant": {"fg": yellow},
+        "String": {"fg": fg},
+        "Character": {"fg": fg},
+        "Number": {"fg": red},
+        "Boolean": {"fg": red},
+        "Identifier": {"fg": fg},
+        "Function": {"fg": func},
+        "Statement": {"fg": magenta},
+        "Operator": {"fg": fg},
+        "PreProc": {"fg": magenta},
+        "Type": {"fg": type_},
+        "StorageClass": {"fg": magenta},
+        "Special": {"fg": cyan},
+        "Delimiter": {"fg": fg},
+        "SpecialComment": {"fg": comment},
+        "Tag": {"fg": blue},
+        "Error": {"fg": red},
+        "Todo": {"fg": yellow, "bold": True},
+
+        # Treesitter
+        "@variable": {"fg": fg},
+        "@variable.builtin": {"fg": magenta},
+        "@variable.member": {"fg": green},
+        "@property": {"fg": green},
+        "@constant.builtin": {"fg": red},
+        "@constant.macro": {"fg": yellow},
+        "@module": {"fg": fg},
+        "@string.special.symbol": {"fg": yellow},
+        "@string.special.url": {"fg": cyan, "underline": True},
+        "@type.builtin": {"fg": type_},
+        "@function.builtin": {"fg": func},
+        "@constructor": {"fg": type_},
+        # Lua's table braces, which its grammar calls constructors
+        "@constructor.lua": {"fg": fg},
+        "@keyword.operator": {"fg": fg},
+        "@punctuation.special": {"fg": fg},
+        "@tag.builtin": {"fg": blue},
+        "@markup": {"fg": fg},
+        "@markup.link": {"fg": cyan},
+        "@markup.link.url": {"fg": cyan, "underline": True},
+        "@markup.raw": {"fg": cyan},
+        "@markup.math": {"fg": cyan},
+        "@markup.list.checked": {"fg": green},
+        "@markup.list.unchecked": {"fg": muted},
+
+        # LSP semantic tokens, as in the VS Code theme's semantic colors
+        "@lsp.type.variable": {},  # keep treesitter's builtins (self, this)
+        "@lsp.typemod.variable.readonly": {"fg": yellow},
+        "@lsp.mod.defaultLibrary": {"fg": type_},
+
+        # Diagnostics and LSP
+        "DiagnosticError": {"fg": red},
+        "DiagnosticWarn": {"fg": yellow},
+        "DiagnosticInfo": {"fg": blue},
+        "DiagnosticHint": {"fg": green},
+        "DiagnosticOk": {"fg": green},
+        "DiagnosticUnderlineError": {"sp": red, "undercurl": True},
+        "DiagnosticUnderlineWarn": {"sp": yellow, "undercurl": True},
+        "DiagnosticUnderlineInfo": {"sp": blue, "undercurl": True},
+        "DiagnosticUnderlineHint": {"sp": green, "undercurl": True},
+        "DiagnosticUnderlineOk": {"sp": green, "undercurl": True},
+        "LspReferenceText": {"bg": over(c["editor.wordHighlightBackground"], bg)},
+        "LspReferenceRead": {"bg": over(c["editor.wordHighlightBackground"], bg)},
+        "LspReferenceWrite": {"bg": over(c["editor.wordHighlightStrongBackground"], bg)},
+        "LspInlayHint": {"fg": comment},
+        "LspCodeLens": {"fg": comment},
+        "LspSignatureActiveParameter": {"fg": blue, "bold": True},
+
+        # Plugins in LazyVim's defaults. The rest take their colors from the
+        # groups above.
+        # Pickers, the file explorer among them, sit on the background like
+        # VS Code's sidebar; floating ones have a border.
+        "SnacksPicker": {"fg": fg, "bg": bg},
+        "SnacksPickerBorder": {"fg": border, "bg": bg},
+        "SnacksPickerTitle": {"fg": fg, "bg": bg, "bold": True},
+        "SnacksPickerFooter": {"fg": muted, "bg": bg},
+        "SnacksPickerListCursorLine": {"bg": row},
+        "SnacksPickerMatch": {"fg": blue, "bold": True},
+        "SnacksPickerDir": {"fg": muted},
+        "SnacksPickerGitStatusUntracked": {"fg": c["gitDecoration.untrackedResourceForeground"]},
+        "SnacksIndent": {"fg": c["editorIndentGuide.background1"]},
+        "SnacksIndentScope": {"fg": c["editorIndentGuide.activeBackground1"]},
+        "SnacksDashboardHeader": {"fg": blue},
+        "SnacksDashboardIcon": {"fg": blue},
+        "SnacksDashboardKey": {"fg": magenta},
+        "SnacksDashboardDesc": {"fg": fg},
+        "SnacksDashboardFile": {"fg": fg},
+        "SnacksDashboardDir": {"fg": muted},
+        "SnacksDashboardFooter": {"fg": muted},
+        "SnacksDashboardSpecial": {"fg": magenta},
+        "BlinkCmpLabelMatch": {"fg": blue, "bold": True},
+        "BlinkCmpLabelDeprecated": {"fg": muted, "strikethrough": True},
+        "BlinkCmpLabelDetail": {"fg": muted},
+        "BlinkCmpLabelDescription": {"fg": muted},
+        "BlinkCmpSource": {"fg": muted},
+        "BlinkCmpGhostText": {"fg": comment},
+        "BlinkCmpKind": {"fg": muted},
+        **kinds(func, "Function", "Method", "Constructor"),
+        **kinds(type_, "Class", "Interface", "Struct", "Enum", "TypeParameter"),
+        **kinds(green, "Field", "Property"),
+        **kinds(yellow, "Constant", "EnumMember"),
+        **kinds(magenta, "Keyword"),
+        "FlashLabel": {"fg": on_accent, "bg": accent, "bold": True},
+        "BufferLineIndicatorSelected": {"fg": blue, "bg": bg},
+        "MiniIconsAzure": {"fg": blue},
+        "MiniIconsBlue": {"fg": blue},
+        "MiniIconsCyan": {"fg": cyan},
+        "MiniIconsGreen": {"fg": green},
+        "MiniIconsGrey": {"fg": muted},
+        "MiniIconsOrange": {"fg": yellow},
+        "MiniIconsPurple": {"fg": magenta},
+        "MiniIconsRed": {"fg": red},
+        "MiniIconsYellow": {"fg": yellow},
+    }
+
+
+# Groups that are the same in both themes.
+NVIM_LINKS = {
+    "CursorColumn": "CursorLine",
+    "SpecialKey": "NonText",
+    "VisualNOS": "Visual",
+    "IncSearch": "CurSearch",
+    "@variable.parameter": "@variable",
+    "@variable.parameter.builtin": "@variable.builtin",
+    "@module.builtin": "@variable.builtin",
+    "@attribute": "PreProc",
+    "@attribute.builtin": "@attribute",
+}
+
+
+def lualine(vs, p, dark):
+    """lualine's colors for one theme: the mode in the VS Code theme's
+    accent (or a hue per mode) and the rest on the background, like VS
+    Code's status bar."""
+    c = vs["colors"]
+    bg, fg = p["background"], p["foreground"]
+    red, green, yellow, blue, magenta, cyan = hues(p, dark)
+    muted = c["descriptionForeground"]
+
+    def mode(color, text=None):
+        text = text or max((bg, fg), key=lambda t: contrast(t, color))
+        return {"a": {"fg": text, "bg": color, "gui": "bold"}}
+
+    plain = {"fg": muted, "bg": bg}
+    return {
+        "normal": {
+            **mode(c["button.background"], c["button.foreground"]),
+            "b": {"fg": fg, "bg": c["button.secondaryBackground"]},
+            "c": plain,
+        },
+        "insert": mode(green),
+        "visual": mode(magenta),
+        "replace": mode(red),
+        "command": mode(yellow),
+        "terminal": mode(cyan),
+        "inactive": {"a": plain, "b": plain, "c": plain},
+    }
+
+
+def lua(value, indent=0):
+    """value as a Lua literal. Tables of up to four plain values, such as a
+    highlight group, stay on one line."""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, str):
+        return json.dumps(value)
+    if isinstance(value, list):
+        return "{ " + ", ".join(lua(v) for v in value) + " }"
+    if not value:
+        return "{}"
+
+    def key(k):
+        return k if k.isidentifier() else f"[{json.dumps(k)}]"
+
+    if len(value) <= 4 and not any(isinstance(v, (dict, list)) for v in value.values()):
+        return "{ " + ", ".join(f"{key(k)} = {lua(v)}" for k, v in value.items()) + " }"
+    pad = "  " * (indent + 1)
+    lines = [f"{pad}{key(k)} = {lua(v, indent + 1)}," for k, v in value.items()]
+    return "{\n" + "\n".join(lines) + "\n" + "  " * indent + "}"
+
+
+def nvim_lua(light, dark):
+    """The colorscheme file. light and dark are (groups, terminal colors)."""
+    return f"""\
+-- Clear Light and Clear Dark for Neovim, generated by clear-theme's build.py
+-- from the VS Code theme. One colorscheme, "clear", that takes the theme for
+-- 'background'. Neovim sets 'background' from the terminal's background
+-- color and reloads the colorscheme when it changes, so it follows the
+-- terminal's light/dark appearance.
+local themes = {{
+  light = {lua(light[0], 1)},
+  dark = {lua(dark[0], 1)},
+}}
+
+local links = {lua(NVIM_LINKS)}
+
+-- The terminal colors, as in the Ghostty theme, for :terminal and lazygit.
+local terminal = {{
+  light = {lua(light[1])},
+  dark = {lua(dark[1])},
+}}
+
+vim.cmd("highlight clear")
+if vim.fn.exists("syntax_on") == 1 then
+  vim.cmd("syntax reset")
+end
+vim.g.colors_name = "clear"
+
+local mode = vim.o.background == "light" and "light" or "dark"
+for name, spec in pairs(themes[mode]) do
+  vim.api.nvim_set_hl(0, name, spec)
+end
+for name, target in pairs(links) do
+  vim.api.nvim_set_hl(0, name, {{ link = target }})
+end
+for i, color in ipairs(terminal[mode]) do
+  vim.g["terminal_color_" .. (i - 1)] = color
+end
+"""
+
+
+def lualine_lua(light, dark):
+    return f"""\
+-- Clear Light and Clear Dark for lualine, generated by clear-theme's build.py.
+-- lualine picks this up for the "clear" colorscheme with its "auto" theme,
+-- and reloads it when 'background' changes.
+local themes = {{
+  light = {lua(light, 1)},
+  dark = {lua(dark, 1)},
+}}
+
+return themes[vim.o.background == "light" and "light" or "dark"]
+"""
+
+
 def main():
     out = Path(__file__).parent / "themes"
     out.mkdir(exist_ok=True)
@@ -652,6 +993,23 @@ def main():
         (tc / f"{slug(name)}.toml").write_text(tuicr_toml(name, colors))
         (tc / colors["syntax_theme"]).write_text(tmtheme(vs))
         print(f"wrote tuicr/{slug(name)}.toml, tuicr/{colors['syntax_theme']}")
+
+    # Neovim looks for colors/ and lua/ at the repo root, so the repo installs
+    # as a plugin.
+    root = Path(__file__).parent
+    (root / "colors").mkdir(exist_ok=True)
+    (root / "colors" / "clear.lua").write_text(nvim_lua(
+        (nvim(vscode["Clear Light"], CLEAR_LIGHT, CLEAR_LIGHT_GRAYS, False), terminal_ansi(CLEAR_LIGHT)),
+        (nvim(vscode["Clear Dark"], CLEAR_DARK, CLEAR_DARK_GRAYS, True), terminal_ansi(CLEAR_DARK)),
+    ))
+    print("wrote colors/clear.lua")
+    themes = root / "lua" / "lualine" / "themes"
+    themes.mkdir(parents=True, exist_ok=True)
+    (themes / "clear.lua").write_text(lualine_lua(
+        lualine(vscode["Clear Light"], CLEAR_LIGHT, False),
+        lualine(vscode["Clear Dark"], CLEAR_DARK, True),
+    ))
+    print("wrote lua/lualine/themes/clear.lua")
 
 
 if __name__ == "__main__":
